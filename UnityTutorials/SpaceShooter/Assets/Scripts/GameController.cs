@@ -1,32 +1,51 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour 
 {
-	public GUIText scoreText;
-	public GUIText restartText;
-	public GUIText gameOverText;
+	public Text scoreText;
+	public Text restartText;
+	public Text gameOverText;
+    public Text levelText;
+    public Text shipDestroyedText;
 	public GameObject[] hazards;
+    public GameObject player;
 	public Vector3 spawnValues;
 	public int hazardCount;
+    public int maxHazards;
+    public static int level;
+    public static int shipCount;
 	public float spawnWait;
+    public float minSpawnWait;
 	public float startWait;
 	public float waveWait;
 
 	private int score;
+    private Vector3 playerSpawnPos;
+    private Quaternion playerSpawnRot;
+    private bool shipDestroyed;
 	private bool gameOver;
 	private bool restart;
 
-	void Start()
+    void Start()
 	{
 		gameOver = false;
 		restart = false;
+        shipDestroyed = false;
 		restartText.text = "";
 		gameOverText.text = "";
+        shipDestroyedText.text = "";
+        levelText.text = level.ToString();
 		score = 0;
+        level = 0;
+        shipCount = 2;
+        playerSpawnPos = new Vector3(0.0f, 0.0f, 0.0f);
+        playerSpawnRot = Quaternion.Euler(0.0f, 0.0f, 0.0f);
 		UpdateScore();
+        UpdateLevel();
+        Instantiate(player, playerSpawnPos, playerSpawnRot);
 		StartCoroutine(SpawnWaves());
 	}
 
@@ -61,6 +80,20 @@ public class GameController : MonoBehaviour
 				restart = true;
 				break;
 			}
+            else
+            {
+                if (!shipDestroyed)
+                {
+                    UpdateLevel();
+                }
+                else
+                {
+                    shipDestroyedText.text = "";
+                    Instantiate(player, playerSpawnPos, playerSpawnRot);
+                    shipDestroyed = false;
+                    yield return new WaitForSeconds(waveWait / 2);
+                }
+            }
 		}
 	}
 
@@ -77,7 +110,28 @@ public class GameController : MonoBehaviour
 
 	public void GameOver()
 	{
-		gameOverText.text = "Game Over!";
+		gameOverText.text = "You are TOAST!!!";
 		gameOver = true;
 	}
+
+    public void UpdateLevel()
+    {
+        level++;
+        levelText.text = "Level: " + level;
+        if(spawnWait >= minSpawnWait && level != 1)
+        {
+            spawnWait -= .05f;
+        }
+        if (hazardCount <= maxHazards && level != 1)
+        {
+            hazardCount++;
+        }
+    }
+
+    public void ShipDestroyed()
+    {
+        shipCount--;
+        shipDestroyedText.text = "The fragments of your ship are scattered and floating through space!!!";
+        shipDestroyed = true;
+    }
 }

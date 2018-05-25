@@ -36,7 +36,14 @@ public class DestroyByContact : MonoBehaviour
 		if(other.tag == "Player")
 		{
 			Instantiate(playerExplosion, other.transform.position, other.transform.rotation);
-			gameController.GameOver();
+            if (GameController.shipCount > 0)
+            {
+                gameController.ShipDestroyed();
+            }
+            else
+            {
+                gameController.GameOver();
+            }
 		}
 		gameController.AddScore(scoreValue);
 		Destroy(other.gameObject);
