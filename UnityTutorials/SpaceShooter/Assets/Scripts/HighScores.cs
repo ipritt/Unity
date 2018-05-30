@@ -1,60 +1,98 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class HighScores : MonoBehaviour
 {
+    public Text restartText;
+    public Text[] playerNamesText;
+    public Text[] highScoresText;
+
     private int i;
-    private int highscore;
-    private string[] keyList = new string[10];
-    private string[] playerArray = new string[10];
-    public Text[] playerText = new Text[10];
-    public Text[] scoreText = new Text[10];
-    
-	void Start ()
+    private int score = GameController.score;
+    private string playerName = ConfirmButton.playerName;
+    private string filePath;
+    private bool fileExists = true;
+
+    private void Awake()
     {
-        //  Set PlayerPrefs
-		for(i = 0; i < keyList.Length; i++)
+        filePath = Application.persistentDataPath + "/SpaceShooterScoreData.dat";
+        restartText.text = "Press 'R' to restart!";
+        Load();
+        if(!fileExists)
         {
-            keyList[i] = "HighScore" + i.ToString();
+            Save();
         }
-        for(i = 0; i < keyList.Length; i++)
+    }
+
+    void Update ()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            if(PlayerPrefs.HasKey(keyList[i]))
+            SceneManager.LoadScene("Main");
+        }
+    }
+
+    public void Save()
+    {
+        int x;
+        FileStream file;
+        HighScoreData data = new HighScoreData();
+        BinaryFormatter bf = new BinaryFormatter();
+        if (fileExists)
+        {
+            file = File.Open(filePath, FileMode.Open);
+            for (i = 0; i < playerNamesText.Length; i++)
             {
-                highscore = PlayerPrefs.GetInt(keyList[i], highscore);
-                if(highscore < GameController.score)
+                data.playerName[i] = playerNamesText[i].text;
+                if(Int32.TryParse(highScoresText[i].ToString(), out x))
                 {
-                    Debug.Log(highscore);
-                    SetScore();
-                    break;
+                    data.highScore[i] = x;
                 }
             }
-            else
-            {
-                SetScore();
-                break;
-            }
         }
-        //  Load Data to Screen
-        for(i = 0; i < playerArray.Length; i++)
+        else
         {
-            if(PlayerPrefs.HasKey(keyList[i]))
+            file = File.Create(filePath);
+            //  Initialize string array
+            for (i = 0; i < data.playerName.Length; i++)
             {
-                playerText[i].text = playerArray[i];
-                scoreText[i].text = PlayerPrefs.GetInt(keyList[i], highscore).ToString();
+                data.playerName[i] = "";
             }
         }
-	}
-    
-    private void SetScore()
-    {
-        PlayerPrefs.SetInt(keyList[i], GameController.score);
-        playerArray[i] = ConfirmButton.playerName;
+
+        bf.Serialize(file, data);
+        file.Close();
     }
-	
-	void Update () {
-		
-	}
+
+    public void Load()
+    {
+        if (File.Exists(filePath))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(filePath, FileMode.Open);
+            HighScoreData data = (HighScoreData)bf.Deserialize(file);
+            file.Close();
+
+            for(i = 0; i < playerNamesText.Length; i++)
+            {
+                playerNamesText[i].text = data.playerName[i];
+                highScoresText[i].text = data.highScore[i].ToString();
+            }
+        }
+        else
+        {
+            fileExists = false;
+        }
+    }
+}
+
+[Serializable]
+class HighScoreData
+{
+    public string[] playerName = new string[10];
+    public int[] highScore = new int[10];
 }

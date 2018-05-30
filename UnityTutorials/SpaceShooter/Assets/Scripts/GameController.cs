@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour 
 {
 	public Text scoreText;
-	public Text restartText;
 	public Text gameOverText;
     public Text levelText;
     public Text shipDestroyedText;
@@ -28,14 +27,11 @@ public class GameController : MonoBehaviour
     private Quaternion playerSpawnRot;
     private bool shipDestroyed;
 	private bool gameOver;
-	private static bool restart;
 
     void Start()
 	{
 		gameOver = false;
-		restart = false;
         shipDestroyed = false;
-		restartText.text = "";
 		gameOverText.text = "";
         shipDestroyedText.text = "";
         levelText.text = level.ToString();
@@ -52,13 +48,7 @@ public class GameController : MonoBehaviour
 
 	void Update()
 	{
-		if(restart)
-		{
-			if(Input.GetKeyDown(KeyCode.R))
-			{
-				SceneManager.LoadScene("Main");
-			}
-		}
+		
 	}
 
 	IEnumerator SpawnWaves()
@@ -78,7 +68,6 @@ public class GameController : MonoBehaviour
 			if(gameOver)
 			{
                 SceneManager.LoadScene("High Scores");
-				restart = true;
 				break;
 			}
             else
