@@ -11,23 +11,24 @@ public class GameController : MonoBehaviour
     public Text levelText;
     public Text shipDestroyedText;
 	public GameObject[] hazards;
+    public GameObject[] playerShips;
     public GameObject player;
 	public Vector3 spawnValues;
 	public int hazardCount;
     public int maxHazards;
     public static int level;
     public static int shipCount;
+    public static int score;
 	public float spawnWait;
     public float minSpawnWait;
 	public float startWait;
 	public float waveWait;
 
-	private int score;
     private Vector3 playerSpawnPos;
     private Quaternion playerSpawnRot;
     private bool shipDestroyed;
 	private bool gameOver;
-	private bool restart;
+	private static bool restart;
 
     void Start()
 	{
@@ -76,7 +77,7 @@ public class GameController : MonoBehaviour
 			yield return new WaitForSeconds (waveWait);
 			if(gameOver)
 			{
-				restartText.text = "Press 'R' for Restart";
+                SceneManager.LoadScene("High Scores");
 				restart = true;
 				break;
 			}
@@ -90,6 +91,7 @@ public class GameController : MonoBehaviour
                 {
                     shipDestroyedText.text = "";
                     Instantiate(player, playerSpawnPos, playerSpawnRot);
+                    playerShips[shipCount].SetActive(false);
                     shipDestroyed = false;
                     yield return new WaitForSeconds(waveWait / 2);
                 }
