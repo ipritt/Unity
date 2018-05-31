@@ -108,10 +108,17 @@ public class GameController : MonoBehaviour
     public void UpdateLevel()
     {
         level++;
-        levelText.text = "Level: " + level;
+        levelText.text = "Wave: " + level;
         if(spawnWait >= minSpawnWait && level != 1)
         {
-            spawnWait -= .05f;
+            if (level < 30 && spawnWait >= 0.2f)
+            {
+                spawnWait -= .05f;
+            }
+            else if(level >= 30)
+            {
+                spawnWait -= .01f;
+            }
         }
         if (hazardCount <= maxHazards && level != 1)
         {

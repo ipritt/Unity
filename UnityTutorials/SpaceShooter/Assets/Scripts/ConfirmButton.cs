@@ -10,6 +10,8 @@ public class ConfirmButton : MonoBehaviour {
     public void Start()
     {
         nameField.text = "";
+        nameField.Select();
+        nameField.ActivateInputField();
     }
 
     public void Update()

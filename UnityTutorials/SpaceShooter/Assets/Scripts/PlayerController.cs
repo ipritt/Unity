@@ -40,6 +40,10 @@ public class PlayerController : MonoBehaviour
                 Instantiate(shot, shotSpawnLeft.position, Quaternion.Euler(0.0f, -10, rigidBody.velocity.x * tilt));
                 Instantiate(shot, shotSpawnRight.position, Quaternion.Euler(0.0f, 10, rigidBody.velocity.x * tilt));
             }
+            if(GameController.level >= 30)
+            {
+                fireRate -= 0.1f;
+            }
             audio.Play();
 		}
 	}
